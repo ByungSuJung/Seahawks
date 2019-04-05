@@ -11,7 +11,7 @@ import json
 import base64
 import pandas as pd
 import config
-
+import os
 
 client_id = config.client_id
 client_secret = config.client_secret
@@ -83,6 +83,13 @@ def album(albums, access_token):
         final.append(album_result)
     return(pd.DataFrame.from_records(final))
 
+def related_artists_of_artist(artist):
+    url = "https://api.spotify.com/v1/artists/{}/related-artists".format(artist)
+    headers = {'Authorization ': "Bearer {}".format(access_token)}
+    r = requests.get(url, headers=headers)
+    json = r.json()
+    return(json)
+
 # The artists function takes name of the artist as a input and
 # return data of related artists of the given artist
 def artists(name, access_token):
@@ -114,6 +121,18 @@ if __name__ == "__main__":
     for i in album_items:
         i.pop('available_markets')
 
-    seahawks_album = album(album_items)
+    seahawks_album = album(album_items, access_token)
 
     drake_related_artists = artists('drake', access_token)
+
+    eminem_related_artists = artists('eminem', access_token)
+
+    export_list = [seahawks_album,drake_related_artists,eminem_related_artists]
+
+    file_names =  ["seahawks_album","drake_related_artists","eminem_related_artists"]
+
+    cwd = os.getcwd()
+
+    for i in range(len(export_list)):
+        path = cwd + "/{}.csv".format(file_names[i])
+        export_list[i].to_csv(path_or_buf= path, header= True)
