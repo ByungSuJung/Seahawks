@@ -104,4 +104,4 @@ venv.bak/
 .mypy_cache/
 
 # myfile
-*.config.py
+config.py
